@@ -1,0 +1,99 @@
+#!/bin/bash
+
+set -e
+
+[[ -x $(command -v tmux) ]] || {
+    echo "tmux not installed ..."
+    exit 1
+}
+
+help() {
+    >&2 echo 'usage: tmuxctl <command> [OPTIONS]
+
+    These are the available commands:
+        jump        smart jump to a directory followed by a session [create and] switch
+        switch      select a sessiont to switch to
+        split       smart split window, if current pane is an ssh session or a shell
+                    running in distrobox it will use them as start command
+    '
+    exit
+}
+
+[[ $# -eq 0 ]] && help
+
+jump() {
+    directory=$(\
+        zoxide query -l |\
+        fzf-tmux -p --reverse --prompt "jump> " --info hidden --scheme=history \
+            --border-label="Zoxide List" --border-label-pos=3 \
+            --color=bg+:#363a4f,bg:#24273a,spinner:#f4dbd6,hl:#ed8796       \
+            --color=fg:#cad3f5,header:#ed8796,info:#c6a0f6,pointer:#f4dbd6  \
+            --color=marker:#f4dbd6,fg+:#cad3f5,prompt:#c6a0f6,hl+:#ed8796   \
+        || true
+    )
+    session_name="${directory##*/}"
+
+    # empty target is valid, just do nothing
+    [[ -z "$session_name" ]] && exit 0
+
+    # Create the session if it does not exist
+    tmux new -d -A -s "$session_name" -c "$directory"
+
+    if [[ -z $TMUX ]]; then
+        exec tmux attach -t "$session_name"
+    else
+        tmux switch-client -t "$session_name"
+    fi
+}
+
+switch() {
+    target=$(\
+        tmux ls -F "#{session_name}" |\
+        fzf-tmux -p --reverse --prompt "session> " --info hidden \
+            --border-label="Tmux Session List" --border-label-pos=3 \
+            --color=bg+:#363a4f,bg:#24273a,spinner:#f4dbd6,hl:#ed8796       \
+            --color=fg:#cad3f5,header:#ed8796,info:#c6a0f6,pointer:#f4dbd6  \
+            --color=marker:#f4dbd6,fg+:#cad3f5,prompt:#c6a0f6,hl+:#ed8796   \
+        || true
+    )
+
+    # empty target is valid, just do nothing
+    [[ -z "$target" ]] && exit 0
+
+    tmux switch-client -t "$target"
+}
+
+split() {
+    local ptty cmd run_cmd=""
+    ptty=$(tmux display -p "#{pane_tty}")
+    cmd=$(ps -o comm=,args= -t "$ptty")
+
+    [[ ! -z $(echo "$cmd" | awk '$1 == "ssh"') ]] && {
+        run_cmd=$(echo "$cmd" | awk '$1 == "ssh"' | awk '{$1=""; print $0}')
+    }
+
+    [[ ! -z $(echo "$cmd" | awk '$1 == "distrobox-enter"') ]] && {
+        run_cmd=$(echo "$cmd" | awk '$1 == "distrobox-enter"' | awk '{$1=$2=""; print $0}')
+    }
+
+    tmux split-window -h -c "#{pane_current_path}" $run_cmd
+}
+
+command="$1"
+shift
+
+case "$command" in
+    jump)
+        jump
+        ;;
+    switch)
+        switch
+        ;;
+    split)
+        split
+        ;;
+    *)
+        echo "Unknown command: $command"
+        help
+        ;;
+esac

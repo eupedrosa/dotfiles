@@ -1,0 +1,33 @@
+window:
+  padding:
+    x: 0
+    y: 0
+    dynamic_padding: false
+  decorations: none
+  startup_mode: Maximized
+  opacity: 0.9
+
+scrolling:
+  history: 10000
+  multiplier: 3
+
+mouse:
+  hide_when_typing: true
+  hints:
+    # Shift click to open an URL
+    modifiers: Shift
+
+font:
+  normal:
+    family: 'JetBrainsMono Nerd Font'
+    style: Regular
+  italic:
+    family: 'JetBrainsMono Nerd Font'
+    style: Italic
+  bold:
+    family: 'JetBrainsMono Nerd Font'
+    style: Bold
+  size: 12
+
+import:
+  - ~/.config/alacritty/catppuccin-macchiato.yml
