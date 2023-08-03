@@ -15,6 +15,7 @@ help() {
         switch      select a sessiont to switch to
         split       smart split window, if current pane is an ssh session or a shell
                     running in distrobox it will use them as start command
+        splitdb     split window with a distrobox shell
     '
     exit
 }
@@ -79,6 +80,24 @@ split() {
     tmux split-window -h -c "#{pane_current_path}" $run_cmd
 }
 
+splitdb() {
+    local list=$(distrobox list --no-color | cut -d'|' -f2 | tail -n +2 | awk '{$1=$1;print}')
+    target=$(\
+        echo "$list" |\
+        fzf-tmux -p --reverse --prompt "container> " --info hidden \
+            --border-label="Distrobox List" --border-label-pos=3 \
+            --color=bg+:#363a4f,bg:#24273a,spinner:#f4dbd6,hl:#ed8796       \
+            --color=fg:#cad3f5,header:#ed8796,info:#c6a0f6,pointer:#f4dbd6  \
+            --color=marker:#f4dbd6,fg+:#cad3f5,prompt:#c6a0f6,hl+:#ed8796   \
+        || true
+    )
+
+    # empty target is valid, just do nothing
+    [[ -z "$target" ]] && exit 0
+
+    tmux split-window -h -c "#{pane_current_path}" "distrobox-enter $target"
+}
+
 command="$1"
 shift
 
@@ -91,6 +110,9 @@ case "$command" in
         ;;
     split)
         split
+        ;;
+    splitdb)
+        splitdb
         ;;
     *)
         echo "Unknown command: $command"
