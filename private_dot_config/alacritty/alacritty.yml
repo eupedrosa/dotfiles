@@ -1,8 +1,8 @@
 window:
   padding:
-    x: 0
-    y: 0
-    dynamic_padding: false
+    x: 2
+    y: 2
+    dynamic_padding: true
   decorations: none
   startup_mode: Maximized
   opacity: 0.9

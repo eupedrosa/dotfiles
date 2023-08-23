@@ -104,6 +104,8 @@ __nl_prompt() {
 
 #################################################
 
+[[ -f /opt/ros/noetic/setup.bash ]] && source /opt/ros/noetic/setup.bash
+
 ## Alias ########################################
 #
 # open without poluting the terminal with messages
@@ -170,7 +172,6 @@ alias pbpaste='xclip -o -selection clipboard'
 [[ -x $(command -v direnv) ]] && eval "$(direnv hook bash)"
 
 #################################################
-
 
 [[ -x $(command -v chezmoi) ]] && eval "$(chezmoi completion bash)"
 

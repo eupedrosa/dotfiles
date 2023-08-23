@@ -32,11 +32,16 @@ o.laststatus = 3
 
 -- Editor
 o.expandtab 	= true
-o.tabstop 	= 4
+o.tabstop 	    = 4
 o.smarttabstop 	= 4
 o.shiftwidth 	= 4
 o.smartcase 	= true
 o.ignorecase 	= true
+
+-- Commands
+if vim.fn.executable('rg') == 1 then
+    o.grepprg = 'rg --vimgrep --smart-case --hidden --glob !.git'
+end
 
 -- disable vim plugins
 g.zipPlugin         = false
@@ -54,6 +59,7 @@ g.loaded_vimball    = true
 g.loaded_vimballPlugin  = true
 g.loaded_2html_plugin   = true
 g.loaded_remote_plugins = true
+g.loaded_netrw          = true
 g.loaded_netrwPlugin    = true
 g.loaded_netrwSettings  = true
 g.loaded_netrwFileHandlers = true
@@ -129,6 +135,7 @@ require("lazy").setup({
     },
 
     {"stevearc/oil.nvim",
+        event = "VeryLazy",
         keys = {{"-", function() require("oil").open() end }},
         name = "oil",
         dependencies = { "nvim-tree/nvim-web-devicons" },
@@ -152,11 +159,21 @@ require("lazy").setup({
         end
     },
 
-    {"echasnovski/mini.completion",
-        version = "*",
+    {"hrsh7th/nvim-cmp",
         event = "InsertEnter",
+        dependencies = {
+            {"hrsh7th/cmp-buffer"},
+            {"hrsh7th/cmp-path"},
+        },
         config = function()
-            require("mini.completion").setup{ }
+            local cmp = require("cmp")
+            cmp.setup({
+                mapping = cmp.mapping.preset.insert({}),
+                sources = cmp.config.sources({
+                    { name = "buffer" },
+                    { name = "path" },
+                }),
+            })
         end
     },
 })
