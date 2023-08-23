@@ -82,6 +82,7 @@ require("lazy").setup({
     {"tpope/vim-repeat"},
     {"tpope/vim-commentary"},
     {"tpope/vim-surround"},
+    {"tpope/vim-dispatch"},
     {"tpope/vim-fugitive", cmd = "G"},
 
     {"catppuccin/nvim", name = "catppuccin",
