@@ -156,6 +156,9 @@ alias pbpaste='xclip -o -selection clipboard'
     alias la='exa -a'
     alias lla='exa -la'
     alias tree='exa --tree'
+    alias tree1='exa --tree -L1'
+    alias tree2='exa --tree -L2'
+    alias tree3='exa --tree -L3'
 }
 
 [[ -x $(command -v tmux) ]] && [[ -x $(command -v tmuxctl) ]] && {
@@ -172,7 +175,12 @@ alias pbpaste='xclip -o -selection clipboard'
 [[ -x $(command -v direnv) ]] && eval "$(direnv hook bash)"
 
 #################################################
+# FUNCTIONS
+#
+function gi() { curl -sL "https://www.toptal.com/developers/gitignore/api/$@"; }
 
+
+#################################################
 [[ -x $(command -v chezmoi) ]] && eval "$(chezmoi completion bash)"
 
 # enable programmable completion features (you don't need to enable
