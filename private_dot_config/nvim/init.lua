@@ -29,6 +29,7 @@ o.cursorline = true
 o.showmode = true
 o.updatetime = 50
 o.laststatus = 3
+o.showmode = false
 
 -- Editor
 o.expandtab 	= true
@@ -85,6 +86,8 @@ require("lazy").setup({
     {"tpope/vim-dispatch"},
     {"tpope/vim-fugitive", cmd = "G"},
 
+    {"kaarmu/typst.vim", ft = "typst"},
+
     {"catppuccin/nvim", name = "catppuccin",
         priority = 1000,
         config = function()
@@ -96,6 +99,19 @@ require("lazy").setup({
                 end
             })
             vim.cmd.colorscheme "catppuccin"
+        end
+    },
+
+    {"nvim-lualine/lualine.nvim",
+        dependencies = { "nvim-tree/nvim-web-devicons"},
+        config = function()
+            require("lualine").setup{
+                options = {
+                    theme = "catppuccin",
+                    section_separators = { left = "", right = ""},
+                    component_separators = { left = "|", right = "|"}
+                },
+            }
         end
     },
 
@@ -141,6 +157,21 @@ require("lazy").setup({
         name = "oil",
         dependencies = { "nvim-tree/nvim-web-devicons" },
         config = true,
+    },
+
+    {"serenevoid/kiwi.nvim",
+        dependencies = { "nvim-lua/plenary.nvim" },
+        keys = {
+            {"<leader>ww", function() require("kiwi").open_wiki_index() end},
+            {"<leader>wd", function() require("kiwi").open_diary_index() end},
+            {"<leader>wn", function() require("kiwi").open_diary_new() end},
+            {"<leader>x", function() require("kiwi").todo.toggle() end},
+        },
+        config = function()
+            require("kiwi").setup({
+                {name = "notes", path= vim.fn.expand("$HOME/play/book/notes")}
+            })
+        end
     },
 
     {"echasnovski/mini.trailspace",
@@ -225,6 +256,18 @@ vim.api.nvim_create_autocmd("FileType", {
         vim.bo[event.buf].buflisted = false
         vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = event.buf, silent = true })
     end,
+})
+
+-- typst file type
+vim.api.nvim_create_autocmd({"BufRead", "BufNewFile"}, {
+    group = augroup("typst_support"),
+    pattern = {"*.typ"},
+    callback = function(event)
+        vim.print("Hello World")
+        vim.api.nvim_buf_call(event.buf, function()
+            vim.api.nvim_cmd({ cmd = 'setf', args = { 'typst' } }, {})
+        end)
+    end
 })
 
 -------------------------------------------------------------
