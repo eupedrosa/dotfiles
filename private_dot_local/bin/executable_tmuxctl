@@ -23,6 +23,9 @@ help() {
 [[ $# -eq 0 ]] && help
 
 jump() {
+    sname=$(tmux display -p -F '#{session_name}')
+    [[ "$sname" == "popup" ]] && tmux display 'jump disabled for this session' && exit 0
+
     directory=$(\
         zoxide query -l |\
         fzf-tmux -p --reverse --prompt "jump> " --info hidden --scheme=history \
@@ -48,8 +51,12 @@ jump() {
 }
 
 switch() {
+    sname=$(tmux display -p -F '#{session_name}')
+    [[ "$sname" == "popup" ]] && tmux display 'switch disabled for this session' && exit 0
+
     target=$(\
         tmux ls -F "#{session_name}" |\
+        grep -v ^popup$ |\
         fzf-tmux -p --reverse --prompt "session> " --info hidden \
             --border-label="Tmux Session List" --border-label-pos=3 \
             --color=bg+:#363a4f,bg:#24273a,spinner:#f4dbd6,hl:#ed8796       \
