@@ -19,13 +19,13 @@ mouse:
 
 font:
   normal:
-    family: 'JetBrainsMono Nerd Font'
+    family: 'alacritty font'
     style: Regular
   italic:
-    family: 'JetBrainsMono Nerd Font'
+    family: 'alacritty font'
     style: Italic
   bold:
-    family: 'JetBrainsMono Nerd Font'
+    family: 'alacritty font'
     style: Bold
   size: 12
 
