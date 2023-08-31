@@ -23,7 +23,7 @@ help() {
 [[ $# -eq 0 ]] && help
 
 jump() {
-    sname=$(tmux display -p -F '#{session_name}')
+    sname=$(tmux display -p -F '#{session_name}' || echo "")
     [[ "$sname" == "popup" ]] && tmux display 'jump disabled for this session' && exit 0
 
     directory=$(\
@@ -51,7 +51,7 @@ jump() {
 }
 
 switch() {
-    sname=$(tmux display -p -F '#{session_name}')
+    sname=$(tmux display -p -F '#{session_name}' || echo "")
     [[ "$sname" == "popup" ]] && tmux display 'switch disabled for this session' && exit 0
 
     target=$(\
