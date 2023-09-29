@@ -1,4 +1,4 @@
-__ direnv || true
+__ direnv || return
 
 eval "$(direnv hook bash)"
 

@@ -10,7 +10,7 @@ __() {
 check_apps() {
     local apps="batcat curl chezmoi direnv exa git nvim fzf xclip zoxide"
 
-    __() { printf "%-10s" $1; [[ -x $(command -v "$1") ]] }
+    __() { printf "%-10s" $1; [[ -x $(command -v "$1") ]]; }
     for a in $apps; do
         __ $a && echo "OK" || echo "FAIL"
     done
@@ -48,4 +48,5 @@ gi() {
 
 #==================================================
 # lots of functions are created for auto completion
-source /etc/bash_completion
+[[ -f /usr/share/bash-completion/bash_completion ]] \
+    && source /usr/share/bash-completion/bash_completion
