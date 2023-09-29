@@ -63,12 +63,27 @@ watts() {
 }
 
 battery() {
-    battery_pct=$(upower -i /org/freedesktop/UPower/devices/battery_BAT0 | \
+
+    [[ $(upower -e | grep -s BAT0 ) ]] && {
+        battery_pct=$(upower -i /org/freedesktop/UPower/devices/battery_BAT0 | \
                 awk '/percentage:/ {print $2}' | tr -d '%')
 
-    [[ "$battery_pct" -lt "25" ]] \
-        && battery="🪫"$battery_pct"%" \
-        || battery="🔋"$battery_pct"%"
+        [[ "$battery_pct" -lt "25" ]] \
+            && battery="🪫"$battery_pct"% " \
+            || battery="🔋"$battery_pct"% "
+    }
+
+    # Get the battery of my MX Master 3S
+    mx=$(bluetoothctl devices | awk '/MX Master 3S/ {print $2}')
+    [[ ! -z "$mx" ]] && {
+        battery_pct=$(bluetoothctl info $mx | grep -oP 'Battery Per.*\(\K\d{2}')
+
+        [[ "$battery_pct" -lt "25" ]] \
+            && battery+="🪫"$battery_pct"%" \
+            || battery+="🔋"$battery_pct"%"
+    }
+
+    echo "$battery"
 }
 
-echo "$(wifi) $(cpu_temp) $(cpu_bars) $(watts)"
+echo "$(wifi) $(battery) $(cpu_temp) $(cpu_bars) $(watts)"
