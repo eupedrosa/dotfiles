@@ -1,6 +1,17 @@
 #!/usr/bin/env bash
 
+source "$HOME/.config/bash/04-secrets.bash"
 load-secrets
+
+wifi() {
+    [[ -f /sbin/iwgetid ]] || { echo ""; return 0; }
+
+    local ssid="  "
+    ssid+="$(/sbin/iwgetid | grep -oP 'ESSID:"\K.*[^"]')"
+    [[ -z "$ssid" ]] && ssid+="<none>"
+
+    echo $ssid
+}
 
 cpu_bars() {
     # see https://github.com/LukeSmithxyz/voidrice/blob/master/.local/bin/statusbar/sb-cpubars
@@ -35,17 +46,29 @@ cpu_bars() {
     echo "$stats" > "$cache"
 }
 
-ssid=$(/sbin/iwgetid | grep -oP 'ESSID:"\K.*[^"]')
-[[ -z "$ssid" ]] && ssid="<none>"
+cpu_temp() {
+    cputemp=$(sensors | awk '/Package id 0/ {print $4}')
+    [[ -z "$cputemp" ]] &&
+        cputemp=$(sensors | awk '/Tctl:/ {print $2}')
 
-cputemp=$(sensors | awk '/Package id 0/ {print $4}')
+    echo "🌡️ $cputemp"
+}
 
-# BATERY
-battery_pct+=$(upower -i /org/freedesktop/UPower/devices/battery_BAT0 | \
-    awk '/percentage:/ {print $2}' | tr -d '%')
-[[ "$battery_pct" -lt "25" ]] \
-    && battery="🪫"$battery_pct"%" \
-    || battery="🔋"$battery_pct"%"
+watts() {
+    [[ "$DESKTOP_HOSTNAME" == "$(hostname)" ]] || return
+    [[ -z "$IOT_URL" ]] && return
 
-# echo "  $ssid 🌡️ $cputemp $(cpu_bars) "$battery""
-echo "  $ssid 🌡️ $cputemp $(cpu_bars) "$battery""
+    w=$(curl -s "$IOT_URL/state/SP02" | jq .power)
+    echo "$w W"
+}
+
+battery() {
+    battery_pct=$(upower -i /org/freedesktop/UPower/devices/battery_BAT0 | \
+                awk '/percentage:/ {print $2}' | tr -d '%')
+
+    [[ "$battery_pct" -lt "25" ]] \
+        && battery="🪫"$battery_pct"%" \
+        || battery="🔋"$battery_pct"%"
+}
+
+echo "$(wifi) $(cpu_temp) $(cpu_bars) $(watts)"
