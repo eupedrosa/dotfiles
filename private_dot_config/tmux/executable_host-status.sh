@@ -47,11 +47,21 @@ cpu_bars() {
 }
 
 cpu_temp() {
-    cputemp=$(sensors | awk '/Package id 0/ {print $4}')
+    cputemp=$(sensors | awk '/Package id 0/ {print $4}' | grep -oP '\+\K\d+\.\d+')
     [[ -z "$cputemp" ]] &&
-        cputemp=$(sensors | awk '/Tctl:/ {print $2}')
+        cputemp=$(sensors | awk '/Tctl:/ {print $2}' | grep -oP '\+\K\d+\.\d+')
 
-    echo "🌡️ $cputemp"
+    temp=$(echo "$cputemp" | grep -oP '^\d+')
+
+    if [[ "$temp" -gt "80" ]]; then
+        therm="#[fg=red]#[fg=default]"
+    elif [[ "$temp" -gt "60" ]]; then
+        therm="#[fg=yellow]#[fg=default]"
+    else
+        therm="#[fg=green]#[fg=default]"
+    fi
+
+    echo "$therm$cputempºC"
 }
 
 watts() {
@@ -59,7 +69,8 @@ watts() {
     [[ -z "$IOT_URL" ]] && return
 
     w=$(curl -s "$IOT_URL/state/SP02" | jq .power)
-    echo "$w W"
+
+    printf "%03s W" "$w"
 }
 
 battery() {
@@ -68,9 +79,15 @@ battery() {
         battery_pct=$(upower -i /org/freedesktop/UPower/devices/battery_BAT0 | \
                 awk '/percentage:/ {print $2}' | tr -d '%')
 
-        [[ "$battery_pct" -lt "25" ]] \
-            && battery="🪫"$battery_pct"% " \
-            || battery="🔋"$battery_pct"% "
+        if [[ "$battery_pct" -lt "25" ]]; then
+            battery+="#[fg=red]󰂎#[fg=default]"$battery_pct"%"
+        elif [[ "$battery_pct" -lt "50" ]]; then
+            battery+="#[fg=yellow]󱊡#[fg=default]"$battery_pct"%"
+        elif [[ "$battery_pct" -lt "75" ]]; then
+            battery+="#[fg=green]󱊢#[fg=default]"$battery_pct"%"
+        else
+            battery+="#[fg=green]󱊣#[fg=default]"$battery_pct"%"
+        fi
     }
 
     # Get the battery of my MX Master 3S
@@ -78,9 +95,15 @@ battery() {
     [[ ! -z "$mx" ]] && {
         battery_pct=$(bluetoothctl info $mx | grep -oP 'Battery Per.*\(\K\d{2}')
 
-        [[ "$battery_pct" -lt "25" ]] \
-            && battery+="🪫"$battery_pct"%" \
-            || battery+="🔋"$battery_pct"%"
+        if [[ "$battery_pct" -lt "25" ]]; then
+            battery+="#[fg=red]󰂎#[fg=default]"$battery_pct"%"
+        elif [[ "$battery_pct" -lt "50" ]]; then
+            battery+="#[fg=yellow]󱊡#[fg=default]"$battery_pct"%"
+        elif [[ "$battery_pct" -lt "75" ]]; then
+            battery+="#[fg=green]󱊢#[fg=default]"$battery_pct"%"
+        else
+            battery+="#[fg=green]󱊣#[fg=default]"$battery_pct"%"
+        fi
     }
 
     echo "$battery"
