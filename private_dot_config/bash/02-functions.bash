@@ -7,6 +7,8 @@ __() {
     return 0
 }
 
+path_add() { [[ ":$PATH:" != *":$1"* ]] && export PATH=$1:$PATH; }
+
 check_apps() {
     local apps="batcat curl chezmoi direnv exa git nvim fzf xclip zoxide"
 

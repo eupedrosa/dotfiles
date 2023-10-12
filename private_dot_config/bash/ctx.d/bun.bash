@@ -5,5 +5,5 @@ export BUN_INSTALL=$HOME/.local/bun
     export PATH=$HOME/.local/bun/bin:$PATH
 
 __ bun || {
-    install-bun(){ curl -fsSL https://bun.sh/install; }
+    install-bun(){ curl -fsSL https://bun.sh/install | bash; }
 }

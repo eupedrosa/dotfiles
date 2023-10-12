@@ -1,3 +1,4 @@
 
-# No function should use __, it is just a helper while loading
+# Unload helper functions
 unset -f __
+unset -f path_add
