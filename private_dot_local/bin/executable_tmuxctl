@@ -40,8 +40,10 @@ jump() {
     # empty target is valid, just do nothing
     [[ -z "$session_name" ]] && exit 0
 
+    session_name="${session_name//\./_}"
     # Create the session if it does not exist
-    tmux new -d -A -s "$session_name" -c "$directory"
+    # It will fail if tmux is already running and the session already exist
+    tmux new -d -A -s "$session_name" -c "$directory" || true
 
     if [[ -z $TMUX ]]; then
         exec tmux attach -t "$session_name"
@@ -68,6 +70,7 @@ switch() {
     # empty target is valid, just do nothing
     [[ -z "$target" ]] && exit 0
 
+    target="${target//\./_}"
     tmux switch-client -t "$target"
 }
 
