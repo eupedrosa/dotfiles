@@ -88,6 +88,8 @@ require("lazy").setup({
 
     {"kaarmu/typst.vim", ft = "typst"},
 
+    {"David-Kunz/gen.nvim"},
+
     {"catppuccin/nvim", name = "catppuccin",
         priority = 1000,
         config = function()
@@ -191,20 +193,46 @@ require("lazy").setup({
         end
     },
 
+    {"neovim/nvim-lspconfig",
+        ft = {"rust", "go"},
+        config = function()
+            local lspconfig = require("lspconfig")
+            -- go install golang.org/x/tools/gopls@latest
+            lspconfig.gopls.setup{}
+            -- see https://rustup.rs/
+            lspconfig.rust_analyzer.setup{}
+
+            -- add a border dot lsp and diagnostics floating window
+            local _border = "single"
+            local h = vim.lsp.handlers
+            h["textDocument/hover"] = vim.lsp.with(h.hover, {border=_border})
+            h["textDocument/signatureHelp"] = vim.lsp.with(h.signature_help, {border=_border})
+
+            vim.diagnostic.config{float={border=_border}}
+        end
+    },
+
     {"hrsh7th/nvim-cmp",
         event = "InsertEnter",
         dependencies = {
             {"hrsh7th/cmp-buffer"},
             {"hrsh7th/cmp-path"},
+            {"hrsh7th/cmp-nvim-lsp"},
         },
         config = function()
             local cmp = require("cmp")
             cmp.setup({
-                mapping = cmp.mapping.preset.insert({}),
+                mapping = cmp.mapping.preset.insert({
+                    ['<C-l>'] = {i = cmp.mapping.confirm({ select = false })},
+                }),
                 sources = cmp.config.sources({
+                    { name = "nvim_lsp" },
                     { name = "buffer" },
                     { name = "path" },
                 }),
+                window = {
+                    documentation = {border="single"}
+                }
             })
         end
     },
@@ -267,6 +295,25 @@ vim.api.nvim_create_autocmd({"BufRead", "BufNewFile"}, {
         vim.api.nvim_buf_call(event.buf, function()
             vim.api.nvim_cmd({ cmd = 'setf', args = { 'typst' } }, {})
         end)
+    end
+})
+
+-- lsp configurations
+vim.api.nvim_create_autocmd("LspAttach", {
+    group = augroup("lsp_user_keys"),
+    callback = function(ev)
+        local map = vim.keymap.set
+        local opt = {buffer = ev.buffer}
+        -- show hover information
+        map("n", "K", vim.lsp.buf.hover, opt)
+        -- goto familiy
+        map("n", "gi", vim.lsp.buf.implementation, opt)
+        map("n", "gd", vim.lsp.buf.definition, opt)
+        map("n", "gD", vim.lsp.buf.declaration, opt)
+        map("n", "gr", vim.lsp.buf.references, opt)
+
+        map('n', '<space>e', vim.diagnostic.open_float, opts)
+        map('n', '<space>q', vim.diagnostic.setloclist, opts)
     end
 })
 
