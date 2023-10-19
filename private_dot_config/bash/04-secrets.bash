@@ -9,7 +9,7 @@ CURRENT_SECRET_KEYS=""
 
 load-secrets() {
 
-    local mod=$(stat "$HOME/.config/secrets.env" | grep -oP "\(\K\d{4}")
+    local mod=$(stat "$HOME/.config/secrets.env" | grep -oE 'Access: \([^/]*' | cut -d'(' -f2-)
     [[ "$mod" == "0600" ]] || {
         echo "INFO: setting '$HOME/.config/secrets.env' permissions to 0600"
         chmod 0600 "$HOME/.config/secrets.env"
