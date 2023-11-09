@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+# `-e` halt on error
+# `-u` exit when undefined variable is used
+# `-o pipefail` return the command code behind a pipe failure
+set -euo pipefail
+
+help() {
+    >&2 echo 'usage: git-bare-clone <repo>
+    '
+    exit 1
+}
+
+# check for no arguments
+[[ $# -eq 0 ]] && {
+    >&2 echo -e 'fatal: You must specify a repository to clone.\n'
+    help
+}
+
+# if .bare of .git exist then exit
+[[ -f ".git" ]] || [[ -d ".bare" ]] && {
+    >&2 echo -e 'fatal: A bare repo already exist.'
+    exit 1
+}
+
+YELLOW="\e[33m"
+ENDCOLOR="\e[0m"
+
+echo -e "${YELLOW}Cloning repository...${ENDCOLOR}"
+# repo name is the first argument
+repo="$1"
+git clone --bare "$repo" .bare
+echo "gitdir: ./.bare" > .git
+
+echo -e "${YELLOW}Ajust fetch location...${ENDCOLOR}"
+git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+
