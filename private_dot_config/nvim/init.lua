@@ -26,7 +26,6 @@ o.incsearch = true
 o.scrolloff = 4
 o.sidescrolloff = 4
 o.cursorline = true
-o.showmode = true
 o.updatetime = 50
 o.laststatus = 3
 o.showmode = false
@@ -80,15 +79,14 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
 
-    {"tpope/vim-repeat"},
-    {"tpope/vim-commentary"},
-    {"tpope/vim-surround"},
-    {"tpope/vim-dispatch"},
+    -- {dir = "~/play/ground/neovim-plugins/prose-indent.nvim"},
+
+    "tpope/vim-repeat",
+    "tpope/vim-commentary",
+    "tpope/vim-surround",
     {"tpope/vim-fugitive", cmd = "G"},
-
     {"kaarmu/typst.vim", ft = "typst"},
-
-    {"David-Kunz/gen.nvim"},
+    {"dbmrq/vim-bucky",  ft = {"markdown", "tex", "plaintex"}},
 
     {"catppuccin/nvim", name = "catppuccin",
         priority = 1000,
@@ -153,8 +151,23 @@ require("lazy").setup({
         }, }, },
     },
 
+    {"ThePrimeagen/harpoon",
+        dependencies = {"nvim-lua/plenary.nvim"},
+        keys = {
+            {"<leader>hh", function() require("harpoon.ui").toggle_quick_menu() end },
+            {"<leader>ha", function() require("harpoon.mark").add_file() end },
+            {"<leader>1",  function() require("harpoon.ui").nav_file(1) end },
+            {"<leader>2",  function() require("harpoon.ui").nav_file(2) end },
+            {"<leader>3",  function() require("harpoon.ui").nav_file(3) end },
+            {"m<cr>",  function() require("harpoon.tmux").sendCommand("{top-right}", "clear && make\r") end },
+
+        },
+        config = function()
+        end
+    },
+
     {"stevearc/oil.nvim",
-        event = "VeryLazy",
+        -- event = "FileExplorer",
         keys = {{"-", function() require("oil").open() end }},
         name = "oil",
         dependencies = { "nvim-tree/nvim-web-devicons" },
@@ -165,8 +178,6 @@ require("lazy").setup({
         dependencies = { "nvim-lua/plenary.nvim" },
         keys = {
             {"<leader>ww", function() require("kiwi").open_wiki_index() end},
-            {"<leader>wd", function() require("kiwi").open_diary_index() end},
-            {"<leader>wn", function() require("kiwi").open_diary_new() end},
             {"<leader>x", function() require("kiwi").todo.toggle() end},
         },
         config = function()
@@ -185,24 +196,22 @@ require("lazy").setup({
         end
     },
 
-    {"echasnovski/mini.pairs",
-        version = "*" ,
+    {"windwp/nvim-autopairs",
         event = "InsertEnter",
-        config = function()
-            require("mini.pairs").setup{}
-        end
+        opts = {} -- this is equalent to setup({}) function
     },
 
     {"neovim/nvim-lspconfig",
         ft = {"rust", "go"},
         config = function()
             local lspconfig = require("lspconfig")
+
             -- go install golang.org/x/tools/gopls@latest
             lspconfig.gopls.setup{}
             -- see https://rustup.rs/
             lspconfig.rust_analyzer.setup{}
 
-            -- add a border dot lsp and diagnostics floating window
+            -- add a border to lsp and diagnostics floating windows
             local _border = "single"
             local h = vim.lsp.handlers
             h["textDocument/hover"] = vim.lsp.with(h.hover, {border=_border})
@@ -275,10 +284,10 @@ vim.api.nvim_create_autocmd("FileType", {
         "man",
         "notify",
         "lspinfo",
-        "spectre_panel",
         "startuptime",
         "tsplayground",
         "PlenaryTestPopup",
+        "fugitive",
     },
     callback = function(event)
         vim.bo[event.buf].buflisted = false
@@ -286,15 +295,12 @@ vim.api.nvim_create_autocmd("FileType", {
     end,
 })
 
--- typst file type
+--
 vim.api.nvim_create_autocmd({"BufRead", "BufNewFile"}, {
-    group = augroup("typst_support"),
-    pattern = {"*.typ"},
+    group = augroup("textwidth"),
+    pattern = {"*.tex", "*.md", "*.txt"},
     callback = function(event)
-        vim.print("Hello World")
-        vim.api.nvim_buf_call(event.buf, function()
-            vim.api.nvim_cmd({ cmd = 'setf', args = { 'typst' } }, {})
-        end)
+        vim.bo[event.buf].textwidth = 100
     end
 })
 
@@ -354,3 +360,9 @@ map("n", "<leader>l", "<cmd>:Lazy<cr>", { desc = "Lazy" })
 -- Save file
 map("n", "<leader>s", "<cmd>up<cr><esc>", { desc = "Save file" })
 
+-- Text Objects
+-- Line
+map("o", "il", ":<c-u>normal! $v^<cr>", {silent = true})
+map("x", "il", ":<c-u>normal! $v^<cr>", {silent = true})
+map("o", "al", ":<c-u>normal! $v0<cr>", {silent = true})
+map("x", "al", ":<c-u>normal! $v0<cr>", {silent = true})

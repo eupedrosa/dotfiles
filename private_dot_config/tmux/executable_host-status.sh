@@ -93,7 +93,7 @@ battery() {
     # Get the battery of my MX Master 3S
     mx=$(bluetoothctl devices | awk '/MX Master 3S/ {print $2}')
     [[ ! -z "$mx" ]] && {
-        battery_pct=$(bluetoothctl info $mx | grep -oP 'Battery Per.*\(\K\d{2}')
+        battery_pct=$(bluetoothctl info $mx | grep -oP 'Battery Per.*\(\K\d{2}\d?')
 
         if [[ "$battery_pct" -lt "25" ]]; then
             battery+="#[fg=red]󰂎#[fg=default]"$battery_pct"%"

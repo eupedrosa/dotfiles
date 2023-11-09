@@ -31,7 +31,7 @@ check_apps() {
 __ fdfind fzf &&
 open() {
     [[ $# -eq 0 ]] && {
-        target=$(fdfind -d 1 -t f | fzf -i --height=~15 || true)
+        target=$(fdfind -I -d 1 -t f | fzf -i --height=~15 || true)
         [[ -z "$target" ]] && return
         cmd="$target"
 
@@ -44,7 +44,7 @@ open() {
 
 # .gitignore (online) generator
 __ curl &&
-gi() {
+gignore() {
     curl -sL "https://www.toptal.com/developers/gitignore/api/$@"
 }
 
