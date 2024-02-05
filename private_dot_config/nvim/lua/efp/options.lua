@@ -6,6 +6,7 @@ local g = vim.g
 
 g.mapleader = ","
 g.maplocalleader = " "
+
 -- disable unused vim plugins
 g.zipPlugin         = false
 g.loaded_zip        = true
@@ -46,8 +47,10 @@ o.sidescrolloff = 4
 o.cursorline = true
 o.updatetime = 50
 o.laststatus = 3
+o.colorcolumn="80"
 
 -- editor
+o.clipboard = "unnamedplus"
 o.expandtab 	= true
 o.tabstop       = 4
 o.smarttabstop 	= 4

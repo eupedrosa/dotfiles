@@ -34,10 +34,10 @@ map("n", "<leader>l", "<cmd>:Lazy<cr>", { desc = "Lazy" })
 map("n", "<leader>s", "<cmd>up<cr><esc>", { desc = "Save file" })
 
 -- clipboard copy & paste
-map("v", "<leader>y", '"*y')
-map("n", "<leader>yy", '"*yy')
-map("n", "<leader>p", '"*P')
-map("v", "<leader>p", '"*P')
+-- map("v", "<leader>y", '"*y')
+-- map("n", "<leader>yy", '"*yy')
+-- map("n", "<leader>p", '"*P')
+-- map("v", "<leader>p", '"*P')
 
 -- Text Objects
 -- Line

@@ -16,6 +16,8 @@ return {
 
             lspconfig.lua_ls.setup{}
 
+            lspconfig.ols.setup{}
+
             -- add a border to lsp and diagnostics floating windows
             local _border = "single"
             local h = vim.lsp.handlers

@@ -50,7 +50,7 @@ vim.api.nvim_create_autocmd({"BufRead", "BufNewFile"}, {
     group = augroup("textwidth"),
     pattern = {"*.tex", "*.md", "*.txt"},
     callback = function(event)
-        vim.bo[event.buf].textwidth = 100
+        vim.bo[event.buf].textwidth = 80
     end
 })
 

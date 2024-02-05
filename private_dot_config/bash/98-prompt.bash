@@ -13,13 +13,13 @@ PS1=""
     PS1+="${bold}${yellow}\u${reset_color} in ${bold}${blue} "
 
 PS1+="${bold}${green}\h${reset_color}"
-if [ -f /etc/bash_completion.d/git-prompt ]; then
-    source /etc/bash_completion.d/git-prompt
-    export GIT_PS1_SHOWDIRTYSTATE=1
-    PS1+=" in ${bold}${blue}\w\$(__git_ps1)\n"
-else
+# if [ -f /etc/bash_completion.d/git-prompt ]; then
+#     source /etc/bash_completion.d/git-prompt
+#     export GIT_PS1_SHOWDIRTYSTATE=1
+#     PS1+=" in ${bold}${blue}\w\$(__git_ps1)\n"
+# else
     PS1+=" in ${bold}${blue}\w\n"
-fi
+# fi
 
 [[ -f /run/.containerenv ]] || [[ -f /.dockerenv ]] && \
     PS1+="${bold}${cyan} "

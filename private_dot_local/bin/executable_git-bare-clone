@@ -6,7 +6,7 @@
 set -euo pipefail
 
 help() {
-    >&2 echo 'usage: git-bare-clone <repo> [dir]
+    >&2 echo 'usage: git-bare-clone <repo>
     '
     exit 1
 }
@@ -17,20 +17,9 @@ help() {
     help
 }
 
-# repo is the first argument
-repo="$1"
-
-# repo directory is the second argument
-[[ $# -eq 2 ]] && {
-    repodir="$2"
-} || {
-    repodir=$(basename $repo)
-    repodir=${repodir%%.*}
-}
-
-# quit if the repo directory already exists
-[[ -d "$repodir" ]] && {
-    >&2 echo -e "fatal: the directory '$repodir' already exist."
+# if .bare of .git exist then exit
+[[ -f ".git" ]] || [[ -d ".bare" ]] && {
+    >&2 echo -e 'fatal: A bare repo already exist.'
     exit 1
 }
 
@@ -38,15 +27,11 @@ YELLOW="\e[33m"
 ENDCOLOR="\e[0m"
 
 echo -e "${YELLOW}Cloning repository...${ENDCOLOR}"
-
-mkdir "$repodir"
-git clone --bare "$repo" "$repodir/.bare" || {
-    rmdir "$repodir"
-    exit 1
-}
-
-echo "gitdir: ./.bare" > "$repodir/.git"
+# repo name is the first argument
+repo="$1"
+git clone --bare "$repo" .bare
+echo "gitdir: ./.bare" > .git
 
 echo -e "${YELLOW}Ajust fetch location...${ENDCOLOR}"
-git config -f $repodir/.bare/config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
 

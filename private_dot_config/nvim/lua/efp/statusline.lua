@@ -1,6 +1,6 @@
 -- [[ My Simple Status Line ]]
 
-local function find_git_repo(file_path)
+local function find_git_repo()
     local dir = vim.fn.expand("%:h")
     while dir ~= '.' and dir ~= "/" do
         local git_dir = dir .. "/.git"
@@ -22,8 +22,7 @@ local function find_git_repo(file_path)
 end
 
 local function git_info()
-    local file_path = vim.fn.expand("%")
-    local git_dir = find_git_repo(file_path)
+    local git_dir = find_git_repo()
     if git_dir == nil then
         return ""
     end

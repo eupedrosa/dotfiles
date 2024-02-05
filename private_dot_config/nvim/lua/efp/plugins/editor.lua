@@ -14,6 +14,7 @@ return {
     {'lewis6991/spaceless.nvim'},
     {"windwp/nvim-autopairs", event="InsertEnter", config=true},
     {"numToStr/Comment.nvim", event="VeryLazy", config=true},
+    {"dbmrq/vim-bucky",  ft = {"markdown", "tex", "plaintex"}},
     {"stevearc/oil.nvim",
         name = "oil",
         keys = {{"-", function() require("oil").open() end }},
